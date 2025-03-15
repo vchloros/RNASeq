@@ -1,19 +1,29 @@
 ---
 title: "RNA-seq Part 1"
-author: "Vinny Chloros"
 format: html
 editor: visual
+author: 
+  - name: Vinny Chloros
+    email: vinny.chloros@snhu.edu
+    affiliations: 
+      - name: Southern New Hampshire University
+date: 3/11/2025
+date-modified: today
+date-format: long
+code-fold: show
+toc: true
+theme: flatly
 ---
+
+For this exercise, I'll be learning RNA-seq, a way to quantify gene expression in large data sets created from genetic information. For this notebook, I'll be trying to analyze gene expression in *Drosophila melanogaster* RNA. The data used here is a sample set from the R Bioinformatics Cookbook.
 
 ```{r setup}
 #| message: false
 
 library(devtools)
 library(rbioinfcookbook)
-```
 
-```{r setup 2}
-#| message: false
+## Remove (#) from the following if you've never installed the following packages
 
 #install.packages("forcats")
 
