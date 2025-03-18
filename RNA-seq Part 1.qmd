@@ -17,6 +17,10 @@ theme: flatly
 
 For this exercise, I'll be learning RNA-seq, a way to quantify gene expression in large data sets created from genetic information. For this notebook, I'll be trying to analyze gene expression in *Drosophila melanogaster* RNA. The data used here is a sample set from the R Bioinformatics Cookbook.
 
+# Setup
+
+I start by loading up the necessary libraries. Some packages rely on BiocManager, so there are a few lines present that install it to then install the dependent packages.
+
 ```{r setup}
 #| message: false
 
@@ -42,6 +46,8 @@ library(edgeR)
 library(Biobase)
 ```
 
+To start, I load in a data set from the R Bioinformatics Cookbook, taking RNA transcripts and their counts to arrange them into a matrix. This format will allow the data to be read into the functions I'll use later.
+
 ```{r load data + make matrix}
 
 genes <- count_dataframe[['gene']]
@@ -53,6 +59,8 @@ count_matrix <- as.matrix(count_dataframe)
 rownames(count_matrix) <- genes
 ```
 
+This next chuck creates an object that will let me specify the columns I'm interested in. For this analysis, that means focusing on "L1Larvae" and "L2Larvae", or the first and second instar of the *Drosophila* larvae.
+
 ```{r phenotypic larval data}
 
 experiments_of_interest <- c("L1Larvae", "L2Larvae")
@@ -60,19 +68,29 @@ experiments_of_interest <- c("L1Larvae", "L2Larvae")
 columns_of_interest <- which(pheno_data[['stage']] %in% experiments_of_interest)
 ```
 
+Then we set "stage" as a factor, or a categorical variable, to compare.
+
 ```{r group by variable}
 
 grouping <- pheno_data[["stage"]] [columns_of_interest] |>
   forcats::as_factor()
 ```
 
+To isolate the columns I want to focus on, I used the following chunk to make a subset of the original matrix so that we have the counts of observations within either the first or second instar.
+
 ```{r column counts}
 counts_of_interest <- count_matrix[,counts = columns_of_interest]
 ```
 
+Then I made another object using the `DGEList` function from `edgeR`, combining the counts of transcripts with the information on the larvae. This object will be used in the proper analysis.
+
 ```{r assemble into object}
 count_dge <- edgeR::DGEList(counts = counts_of_interest, group = grouping)
 ```
+
+## Analysis
+
+Now for the differential analysis!
 
 ```{r visualize}
 design <- model.matrix(~grouping)
@@ -85,3 +103,26 @@ result <- edgeR::glmQLFTest(fit, coef=2)
 
 topTags(result)
 ```
+
+As seen above, the analysis brought back the top ten genes from the test that was ran. FDR is the variable in focus here since it allows us to identify the genes that vary between the two instars. Using [FlyBase](https://flybase.org/), I can search for these genes and see what functions they are associated with.
+
+| Gene Name   	| Molecular Function            	| Biological Process 	| Cellular Component                                   	|
+|-------------	|-------------------------------	|--------------------	|------------------------------------------------------	|
+| FBgn0027527 	|                               	|                    	| membrane,<br>cell periphery, <br>endomembrane system 	|
+| FBgn0037430 	|                               	|                    	| membrane,<br>cell periphery                          	|
+| FBgn0037424 	|                               	| development        	| membrane,<br>cell periphery, <br>endomembrane system 	|
+| FBgn0037414 	|                               	|                    	| membrane,<br>cell periphery                          	|
+| FBgn0029807 	| enzyme, <br>metal ion binding 	| protein metabolism 	| extracellular region                                 	|
+| FBgn0037429 	|                               	| development        	| membrane,<br>cell periphery, <br>endomembrane system 	|
+| FBgn0037224 	| structural molecule           	| development        	| cell periphery                                       	|
+| FBgn0030340 	|                               	|                    	| endomembrane system                                  	|
+| FBgn0029716 	|                               	|                    	|                                                      	|
+| FBgn0243586 	| structural molecule           	| development        	| cell periphery                                       	|
+
+: RNA Functions {.striped .hover}
+
+This table I made summarizes some of the categories listed that each gene has some part in. Most of them have at least some influence in cell components, particularly plasma membranes and other features related to the membrane. A handful also influenced development, and two were a part of structural molecular function, particularly in the formation of chitin according to FlyBase.
+
+My hypothesis for why these genes in particular are so different between the first and second instar is because of the formation of an exoskeleton during larval development. Maybe the genes affecting membranes are aiding in the development of a chitinous outer layer, sort of like the keratinized cells on the outermost layer of skin.
+
+This exercise was good surface-level introduction to bioinformatics. I learned how to import RNA data to create a usable object, and how to apply that to a function that analyzes the differences in expression. I tried to do a small look into the fuctions of the genes that were selected by the earlier test, so I'm curious to see how we will learn to visualize our results in class. 
