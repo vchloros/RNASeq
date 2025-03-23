@@ -53,4 +53,4 @@ ht_1 <- Heatmap(mat, name="log(TPM)", row_km = 6, col = data_col_func, top_annot
 ComplexHeatmap::draw(ht_1)
 ```
 
-Note: some expression within Edi-0 ecotype are "swapped" with expressions from one plant part looking like the distributions expected in the others in different ecotypes. 
+At first glance, the distribution of gene expression between different ecotypes seems largely uniform. Plant parts do seem to vary from each other, but between their different forms, expression is similar. At first I thought ecotype Edi-0 had an interesting case where the expression between its parts looked "swapped" compared to others, but then I realized the heatmap changed how its data was arranged compared to the others. In reality, they resemble the others. 
