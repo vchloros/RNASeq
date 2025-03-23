@@ -4,7 +4,11 @@ format: html
 editor: visual
 ---
 
+As the second part of learning to work with RNA-seq data, 
+
 ```{r load packages}
+#| message: false
+
 library(ComplexHeatmap)
 library(viridisLite)
 library(stringr)
@@ -13,7 +17,7 @@ library(circlize)
 library(rbioinfcookbook)
 ```
 
-Pull data from rcookbook, isolate ecotypes, then split data by ecotype.
+The first step after loading the necessary packages is to pull the data from rcookbook. Then, I can isolate the names of the plant "ecotypes" of interest and split then split data by different ecotypes.
 
 ```{r load data}
 mat <- log(as.matrix(at_tf_gex[ , 5:55]))
@@ -21,7 +25,7 @@ ecotype <- stringr::str_split(colnames(mat), ",", simplify = TRUE)[,1]
 part <- stringr::str_split(colnames(mat), ",", simplify = TRUE)[,2]
 ```
 
-Make color palette.
+This next code chunk is used to make a color palette that I'll use to visualize the data. 
 
 ```{r color palette}
 data_col_func <- circlize::colorRamp2(seq(0, max(mat), length.out = 6), viridisLite::magma(6))
@@ -33,11 +37,15 @@ part_colors <- RColorBrewer::brewer.pal(3, "Accent")
 names(part_colors) <- unique(part)
 ```
 
+The next chuck adds labels to the heatmap that will be drawn so that it is more easily understood, labeling the plant parts and ecotypes so they can be distinguished from one another.
+
 ```{r add anontations}
 top_annot <- HeatmapAnnotation("Ecotype" = ecotype, "Plant Part" = part, col = list("Ecotype" = ecotype_colors, "Plant Part" = part_colors), annotation_name_side = "left")
 
 side_annot <- rowAnnotation(length = anno_points(at_tf_gex$Length, pch = 16, size = unit(1, "mm"), axis_param = list(at = seq(1, max(at_tf_gex$Length), length.out = 4)),))
 ```
+
+Lastly, this final chunk will draw a heatmap based on the RNA data and label it with the previous chunk's specifications. 
 
 ```{r draw heatmap}
 ht_1 <- Heatmap(mat, name="log(TPM)", row_km = 6, col = data_col_func, top_annotation = top_annot, right_annotation = side_annot, cluster_columns = TRUE, column_split = ecotype, show_column_names = FALSE, column_title = " ")
