@@ -2,6 +2,17 @@
 title: "RNA-seq Part 2"
 format: html
 editor: visual
+author: 
+  - name: Vinny Chloros
+    email: vinny.chloros@snhu.edu
+    affiliations: 
+      - name: Southern New Hampshire University
+date: 3/11/2025
+date-modified: today
+date-format: long
+code-fold: show
+toc: true
+theme: flatly
 ---
 
 As the second part of learning to work with RNA-seq data, 
